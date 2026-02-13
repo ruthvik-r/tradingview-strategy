@@ -49,7 +49,7 @@ crossCondition = totalCross > 0
 
 // New thingy: VOLUME CONDITION 
 avgVolume = ta.sma(volume, 10)
-volumeCheck = volume > (avgVolume * volThreshold)
+volumeCheck = volume > (avgVolume * volThreshold) and open < close
 rsi = ta.rsi(close, 14) < 50
 
 // Candle Check 
@@ -63,7 +63,7 @@ emaSpread = ((maxEma - minEma) / minEma) * 100
 isEntangled = emaSpread < 1.1
 
 // BUY 
-buyCondition = structureBull and crossCondition and volumeCheck and rsi and not isEntangled
+buyCondition = structureBull and crossCondition and volumeCheck
 
 if buyCondition
     strategy.entry("BUY", strategy.long)
