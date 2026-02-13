@@ -8,6 +8,7 @@ ema100Len = input.int(100, title="EMA 100")
 ema200Len = input.int(200, title="EMA 200")
 
 lookback = input.int(10, title="Cross Lookback Bars")
+lookfutherback = input.int(20, title="Cross Lookfutherback Bars")
 
 trailStart = input.float(8.0, title="Trail Start %") / 100
 trailDist  = input.float(2.0, title="Trail Distance %") / 100
@@ -37,19 +38,14 @@ structureBull =
 cross20above50  = ta.barssince(ta.crossover(ema20, ema50))  <= lookback ?1:0
 cross20above100 = ta.barssince(ta.crossover(ema20, ema100)) <= lookback ?1:0
 cross20above200 = ta.barssince(ta.crossover(ema20, ema200)) <= lookback ?1:0
-cross50above20 = ta.barssince(ta.crossover(ema50, ema20)) <= lookback ?1:0
-cross50above100 = ta.barssince(ta.crossover(ema50, ema100)) <= lookback ?1:0
-cross50above200 = ta.barssince(ta.crossover(ema50, ema200)) <= lookback ?1:0
-cross100above20 = ta.barssince(ta.crossover(ema100, ema20)) <= lookback ?1:0
-cross100above50 = ta.barssince(ta.crossover(ema100, ema50)) <= lookback ?1:0
-cross100above200 = ta.barssince(ta.crossover(ema100, ema200)) <= lookback ?1:0
-cross200above20 = ta.barssince(ta.crossover(ema200, ema20)) <= lookback ?1:0
-cross200above50 = ta.barssince(ta.crossover(ema200, ema50)) <= lookback ?1:0
-cross200above100 = ta.barssince(ta.crossover(ema200, ema100)) <= lookback ?1:0
+cross50above20 = ta.barssince(ta.crossover(ema50, ema20)) <= lookfutherback ?1:0
 
-
-totalCross = cross20above50 + cross20above100 + cross20above200 +cross50above20 + cross50above100 + cross50above200 + cross100above20 + cross100above50 + cross100above200 + cross200above20 + cross200above50 + cross200above100
-crossCondition = totalCross == 1
+var int totalCross = 0
+if cross20above50 == 1 and cross50above20 == 1 
+    totalCross := 0
+else 
+    totalCross := cross20above50 + cross20above100 + cross20above200
+crossCondition = totalCross > 0
 
 // New thingy: VOLUME CONDITION 
 avgVolume = ta.sma(volume, 10)
@@ -64,10 +60,10 @@ openGood = open > avgClose[1]
 maxEma = math.max(ema20, ema50)
 minEma = math.min(ema20,ema50)
 emaSpread = ((maxEma - minEma) / minEma) * 100
-isEntangled = emaSpread < 1.2
+isEntangled = emaSpread < 1.1
 
 // BUY 
-buyCondition = structureBull and crossCondition and volumeCheck and rsi and openGood
+buyCondition = structureBull and crossCondition and volumeCheck and rsi and not isEntangled
 
 if buyCondition
     strategy.entry("BUY", strategy.long)

@@ -1,2 +1,1 @@
-# tradingview-strategy
-Trying things out
+# EMA Structure + Recent EMA cross with good spread + Greedy Trail Loss
